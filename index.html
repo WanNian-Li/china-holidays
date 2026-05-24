@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>中国节假日订阅日历</title>
+  <style>
+    :root {
+      --red: #FF3B30;
+      --green: #34C759;
+      --bg: #f5f5f7;
+      --card: #ffffff;
+      --text: #1d1d1f;
+      --muted: #6e6e73;
+      --radius: 12px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, "PingFang SC", "Helvetica Neue", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 48px 20px;
+    }
+    header { text-align: center; margin-bottom: 40px; }
+    header h1 { font-size: 2rem; font-weight: 700; margin-bottom: 8px; }
+    header p  { color: var(--muted); font-size: 1rem; line-height: 1.6; }
+    .tags { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-top: 14px; }
+    .tag {
+      background: var(--card);
+      border-radius: 20px;
+      padding: 4px 14px;
+      font-size: 0.85rem;
+      color: var(--muted);
+      box-shadow: 0 1px 4px rgba(0,0,0,.08);
+    }
+
+    .card {
+      background: var(--card);
+      border-radius: var(--radius);
+      padding: 28px;
+      max-width: 560px;
+      width: 100%;
+      box-shadow: 0 2px 12px rgba(0,0,0,.08);
+      margin-bottom: 20px;
+    }
+    .card h2 { font-size: 1.1rem; margin-bottom: 16px; }
+
+    .btn-subscribe {
+      display: block;
+      width: 100%;
+      padding: 14px;
+      background: var(--red);
+      color: #fff;
+      text-align: center;
+      text-decoration: none;
+      border-radius: 10px;
+      font-size: 1rem;
+      font-weight: 600;
+      transition: opacity .15s;
+    }
+    .btn-subscribe:hover { opacity: .85; }
+
+    .url-box {
+      background: var(--bg);
+      border-radius: 8px;
+      padding: 12px 14px;
+      font-size: 0.82rem;
+      font-family: "SF Mono", "Menlo", monospace;
+      word-break: break-all;
+      color: var(--muted);
+      margin-top: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+    .copy-btn {
+      flex-shrink: 0;
+      padding: 4px 10px;
+      background: var(--text);
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      font-size: 0.78rem;
+      cursor: pointer;
+    }
+    .copy-btn:hover { opacity: .8; }
+
+    .steps { counter-reset: step; padding: 0; list-style: none; }
+    .steps li {
+      counter-increment: step;
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      margin-bottom: 12px;
+      font-size: 0.93rem;
+      line-height: 1.5;
+    }
+    .steps li::before {
+      content: counter(step);
+      flex-shrink: 0;
+      width: 22px; height: 22px;
+      background: var(--red);
+      color: #fff;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.75rem; font-weight: 700;
+    }
+
+    footer {
+      margin-top: 40px;
+      color: var(--muted);
+      font-size: 0.8rem;
+      text-align: center;
+      line-height: 1.8;
+    }
+    footer a { color: var(--muted); }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>🗓 中国节假日订阅日历</h1>
+  <p>一次订阅，永久自动更新<br>适用于 iPhone · iPad · Mac · Apple Watch</p>
+  <div class="tags">
+    <span class="tag">🔴 法定节假日</span>
+    <span class="tag">🔧 调休补班</span>
+    <span class="tag">🏮 传统节日</span>
+    <span class="tag">🌿 二十四节气</span>
+  </div>
+</header>
+
+<!-- iPhone / Mac 一键订阅 -->
+<div class="card">
+  <h2>📱 iPhone / iPad / Mac 订阅</h2>
+  <a id="btn-apple" href="#" class="btn-subscribe">点击订阅到苹果日历</a>
+  <div class="url-box">
+    <span id="webcal-url">加载中…</span>
+    <button class="copy-btn" onclick="copyUrl('webcal-url')">复制</button>
+  </div>
+  <ol class="steps" style="margin-top:18px">
+    <li>点击上方「订阅」按钮，系统会询问是否打开日历 App</li>
+    <li>确认后选择「订阅」，可设置颜色与刷新频率</li>
+    <li>完成！节假日变化时日历自动同步</li>
+  </ol>
+</div>
+
+<!-- Google 日历 -->
+<div class="card">
+  <h2>🌐 Google 日历 / 其他日历</h2>
+  <div class="url-box">
+    <span id="https-url">加载中…</span>
+    <button class="copy-btn" onclick="copyUrl('https-url')">复制</button>
+  </div>
+  <ol class="steps" style="margin-top:18px">
+    <li>复制上方 HTTPS 链接</li>
+    <li>Google 日历 → 「其他日历」→ 「通过网址添加」</li>
+    <li>粘贴链接，点击「添加日历」</li>
+  </ol>
+</div>
+
+<!-- 直接下载 -->
+<div class="card">
+  <h2>⬇️ 直接下载（一次性导入）</h2>
+  <p style="color:var(--muted);font-size:.9rem;line-height:1.6">
+    下载 .ics 文件后双击导入，不会自动更新。<br>
+    建议使用上方订阅方式以获得每年调休自动同步。
+  </p>
+  <a id="btn-download" href="china-holidays.ics" download
+     style="display:inline-block;margin-top:14px;color:var(--red);font-size:.9rem">
+    下载 china-holidays.ics
+  </a>
+</div>
+
+<footer>
+  数据来源：国务院官方节假日公告 &amp; 天文节气计算<br>
+  2026 年调休数据为预估，以官方公告为准<br>
+  <a href="china-holidays.ics">直接访问 .ics 文件</a>
+</footer>
+
+<script>
+  (function () {
+    var base = location.href.replace(/index\.html$/, "").replace(/\/$/, "");
+    var https  = base + "/china-holidays.ics";
+    var webcal = https.replace(/^https?:\/\//, "webcal://");
+
+    document.getElementById("btn-apple").href    = webcal;
+    document.getElementById("btn-download").href = https;
+    document.getElementById("webcal-url").textContent = webcal;
+    document.getElementById("https-url").textContent  = https;
+  })();
+
+  function copyUrl(id) {
+    var text = document.getElementById(id).textContent;
+    navigator.clipboard.writeText(text).then(function () {
+      var btn = event.target;
+      btn.textContent = "已复制";
+      setTimeout(function () { btn.textContent = "复制"; }, 1500);
+    });
+  }
+</script>
+
+</body>
+</html>
