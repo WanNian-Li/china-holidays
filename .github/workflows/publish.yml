@@ -6,11 +6,11 @@ on:
     paths:
       - "data/**"
       - "scripts/**"
+      - "requirements.txt"
   schedule:
-    # 每年 1 月 2 日 02:00 UTC 自动触发（国务院通常在 12 月底或 1 月初公告）
+    # 每年 1 月 2 日 02:00 UTC — 国务院通常在 12 月底发布次年公告
     - cron: "0 2 2 1 *"
   workflow_dispatch:
-    # 支持手动触发，方便在国务院更新公告后立即发布
 
 jobs:
   build-and-deploy:
@@ -27,13 +27,25 @@ jobs:
         with:
           python-version: "3.12"
 
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      # 1. 从 holiday-cn 拉取最新官方节假日（网络失败不阻断构建）
+      - name: Fetch official holiday data
+        run: python scripts/fetch_holidays.py
+        continue-on-error: true
+
+      # 2. 天文计算节气（无网络依赖，始终精确）
+      - name: Calculate solar terms
+        run: python scripts/calc_solar_terms.py
+
+      # 3. 合并生成 ICS
       - name: Generate ICS
         run: python scripts/generate.py
 
       - name: Prepare deploy directory
         run: |
           cp index.html output/index.html
-          # 禁用 Jekyll，让 GitHub Pages 直接托管静态文件
           touch output/.nojekyll
 
       - name: Deploy to GitHub Pages
@@ -41,7 +53,6 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./output
-          # 每次全量覆盖，保持 output 与生成结果一致
           force_orphan: true
           user_name: "github-actions[bot]"
           user_email: "github-actions[bot]@users.noreply.github.com"

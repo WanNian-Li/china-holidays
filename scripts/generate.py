@@ -67,7 +67,7 @@ def load_year(path: Path) -> list[str]:
 
     for h in data.get("legal_holidays", []):
         events.append(make_vevent(
-            name=f"🔴 {h['name']}",
+            name=f"{h['name']}",
             start=h["start"],
             days=h["days"],
             description=h.get("note", f"法定节假日，放假{h['days']}天"),
@@ -75,7 +75,7 @@ def load_year(path: Path) -> list[str]:
 
     for w in data.get("workday_adjustments", []):
         events.append(make_vevent(
-            name="🔧 调休补班",
+            name="调休补班",
             start=w["date"],
             days=1,
             description=w.get("note", "调休补班工作日"),
@@ -83,7 +83,7 @@ def load_year(path: Path) -> list[str]:
 
     for t in data.get("traditional_holidays", []):
         events.append(make_vevent(
-            name=f"🏮 {t['name']}",
+            name=f"{t['name']}",
             start=t["date"],
             days=1,
             description=t.get("note", ""),
@@ -100,7 +100,7 @@ def load_solar_terms(path: Path) -> list[str]:
             continue
         for term in year_terms:
             events.append(make_vevent(
-                name=f"🌿 {term['name']}",
+                name=f"{term['name']}",
                 start=term["date"],
                 days=1,
                 description="二十四节气",
