@@ -1,0 +1,48 @@
+name: Generate & Publish Calendar
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "data/**"
+      - "scripts/**"
+  schedule:
+    # 每年 1 月 2 日 02:00 UTC 自动触发（国务院通常在 12 月底或 1 月初公告）
+    - cron: "0 2 2 1 *"
+  workflow_dispatch:
+    # 支持手动触发，方便在国务院更新公告后立即发布
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Generate ICS
+        run: python scripts/generate.py
+
+      - name: Prepare deploy directory
+        run: |
+          cp index.html output/index.html
+          # 禁用 Jekyll，让 GitHub Pages 直接托管静态文件
+          touch output/.nojekyll
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./output
+          # 每次全量覆盖，保持 output 与生成结果一致
+          force_orphan: true
+          user_name: "github-actions[bot]"
+          user_email: "github-actions[bot]@users.noreply.github.com"
+          commit_message: "chore: auto-update calendar [${{ github.sha }}]"
